@@ -1,0 +1,68 @@
+exclude: ['README.md']
+timezone: US/Eastern
+talks:
+  -
+    title: Bidirectinal GAN
+    detail: Talk at Lawrence Carin's Group at Duke, 2017.
+    url: "http://www.cs.jhu.edu/~alopez/talks/gpus-oct2013-google.pdf"
+    img: "google-talk.jpg"
+
+papers:
+  - layout: paper
+    selected: yes
+    year: 2019
+    paper-type:  inproceedings
+    img: inpress2
+    title:  <a href="https://arxiv.org/pdf/1712.09097.pdf">On Connecting Stochastic Gradient MCMC and Differential Privacy</a>
+    authors: Bai Li, Changyou Chen, <b>Hao Liu</b> and Lawrence Carin
+    booktitle: International Conference on Artificial Intelligence and Statistics(AISTATS)
+    booktitle-url: https://www.aistats.org/
+    venue: conference paper
+    doc-url: https://arxiv.org/abs/1712.09097
+    abstract: >
+      Significant success has been realized recently on applying machine learning to real-world applications. There have also been corresponding concerns on the privacy of training data, which relates to data security and confidentiality issues. Differential privacy provides a principled and rigorous privacy guarantee on machine learning models. While it is common to design a model satisfying a required differential-privacy property by injecting noise, it is generally hard to balance the trade-off between privacy and utility. We show that stochastic gradient Markov chain Monte Carlo (SG-MCMC) – a class of scalable Bayesian posterior sampling algorithms proposed recently – satisfies strong differential privacy with carefully chosen step sizes. We develop theory on the performance of the proposed differentially-private SG-MCMC method. We conduct experiments to support our analysis, and show that a standard SG-MCMC sampler without any modification (under a default setting) can reach state-of-the-art performance in terms of both privacy and utility on Bayesian learning.
+
+  - layout: paper
+    selected: yes
+    year: 2018
+    paper-type:  inproceedings
+    img: aaai2018
+    title:  <a href="https://arxiv.org/pdf/1710.04806.pdf">Deep Learning for Case-based Reasoning through Prototypes:A Neural Network that Explains its Predictions</a>
+    authors: Oscar Li*, <b>Hao Liu</b>*, Chaofan Chen and Cynthia Rudin (* equal contribution)
+    booktitle: AAAI Conference on Artificial Intelligence(AAAI)
+    booktitle-url: https://nips.cc
+    venue: conference paper
+    doc-url: https://arxiv.org/pdf/1710.04806.pdf
+    abstract: >
+      Deep neural networks are widely used for classification. These deep models often suffer from a lack of interpretability -- they are particularly difficult to understand because of their non-linear nature. As a result, neural networks are often treated as ''black box'' models, and in the past, have been trained purely to optimize the accuracy of predictions. In this work, we create a novel network architecture for deep learning that naturally explains its own reasoning for each prediction. This architecture contains an autoencoder and a special prototype layer, where each unit of that layer stores a weight vector that resembles an encoded training input. The encoder of the autoencoder allows us to do comparisons within the latent space, while the decoder allows us to visualize the learned prototypes. The training objective has four terms: an accuracy term, a term that encourages every prototype to be similar to at least one encoded input,  a term that encourages every encoded input to be close to at least one prototype, and a term that encourages faithful reconstruction by the autoencoder. The distances computed in the prototype layer are used as part of the classification process. Since the prototypes are learned during training, the learned network naturally comes with explanations for each prediction, and the explanations are loyal to what the network actually computes.
+
+  - layout: paper
+    selected: yes
+    year: 2017
+    paper-type: inproceedings
+    img: prgg
+    title: <a href="https://arxiv.org/pdf/1709.01215.pdf"> ALICE:Towards Understanding Adversarial Learning for Joint Distribution Matching </a> <a href="./papers/alice_poster.pdf">  [Poster at NIPS 2017]  </a>
+    authors: Chunyuan Li, <b>Hao Liu</b>, Changyou Chen, Yunchen Pu, Liqun Chen, Ricardo Henao and Lawrence Carin 
+    booktitle:  Neural Information Processing Systems(NIPS)
+    booktitle-url: https://nips.cc
+    venue: conference paper
+    doc-url: https://arxiv.org/pdf/1709.01215.pdf
+    code: https://github.com/ChunyuanLI/ALICE
+    abstract: >
+      We investigate the non-identifiability issues associated with bidirectional adversarial training for joint distribution matching. Within a framework of conditional entropy, we propose both adversarial and non-adversarial approaches to learn desirable matched joint distributions for unsupervised and supervised tasks. We unify a broad family of adversarial models as joint distribution matching problems. Our approach stabilizes learning of unsupervised bidirectional adversarial learning methods. Further, we introduce an extension for semi-supervised learning tasks. Theoretical results are validated in synthetic data and real-world applications.
+  - layout: paper
+    selected: yes
+    year: 2017
+    paper-type: inproceedings
+    img: rgg
+    title: <a href="https://arxiv.org/pdf/1709.06548.pdf">Triangle Generative Adversarial Networks </a> <a href="./papers/TriangleGAN_poster.pdf">  [Poster at NIPS 2017]  </a>
+    authors: Zhe Gan, Liqun Chen, Weiyao Wang, Yunchen Pu, Yizhe Zhang, <b>Hao Liu</b>, Chunyuan Li and Lawrence Carin
+    booktitle:  Neural Information Processing Systems(NIPS)
+    booktitle-url: https://nips.cc
+    venue: conference paper
+    doc-url: https://arxiv.org/pdf/1709.06548.pdf
+    code: https://github.com/LiqunChen0606/Triangle-GAN
+    abstract: >
+      A Triangle Generative Adversarial Network (∆-GAN) is developed for semisupervised cross-domain joint distribution matching, where the training data consists of samples from each domain, and supervision of domain correspondence is provided by only a few paired samples. ∆-GAN consists of four neural networks, two generators and two discriminators. The generators are designed to learn the two-way conditional distributions between the two domains, while the discriminators implicitly define a ternary discriminative function, which is trained to distinguish real data pairs and two kinds of fake data pairs. The generators and discriminators are trained together using adversarial learning. Under mild assumptions, in theory the joint distributions characterized by the two generators concentrate to the data distribution. In experiments, three different kinds of domain pairs are considered, image-label, image-image and image-attribute pairs. Experiments on semi-supervised image classification, image-to-image translation and attribute-based image generation demonstrate the superiority of the proposed approach.
+
+
