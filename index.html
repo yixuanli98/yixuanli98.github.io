@@ -92,6 +92,52 @@
         </td>
       </tr>
 
+          <tr onmouseout="layerpano3d_stop()" onmouseover="layerpano3d_start()">
+      <td style="padding:20px;width:25%;vertical-align:middle">
+        <div class="one">
+          <div class="two" id='layerpano3d_image'><video  width=100% muted autoplay loop>
+          <source src="images/layerpano3d.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+          </video></div>
+          <img src='images/layerpano3d.png' width=100%>
+        </div>
+        <script type="text/javascript">
+          function layerpano3d_start() {
+            document.getElementById('layerpano3d_image').style.opacity = "1";
+          }
+
+          function layerpano3d_stop() {
+            document.getElementById('layerpano3d_image').style.opacity = "0";
+          }
+          layerpano3d_stop()
+        </script>
+      </td>
+      <td style="padding:20px;width:75%;vertical-align:middle">
+        <strong>LayerPano3D: Layered 3D Panorama for Hyper-Immersive Scene Generation</strong>
+        <br>
+        <a href="https://ys-imtech.github.io/">Shuai Yang*</a>,
+        <a href="ttps://sparkstj.github.io/">Jing Tan*</a>,
+        <a href="https://github.com/kszpxxzmc/">Mengchen Zhang</a>,
+        <a href="https://wutong16.github.io/">Tong Wu</a>,
+        <strong>Yixuan Li</strong>,
+        <a href="https://stanford.edu/~gordonwz/">Gordon Wetzstein</a>,
+        <a href="https://liuziwei7.github.io/">Ziwei Liu</a>,
+        <a href="http://dahua.site/">Dahua Lin</a>
+        <br>
+        <em>Arxiv</em>, 2024
+        <br>
+        <a href="https://ys-imtech.github.io/projects/LayerPano3D/">project page</a>
+        /
+        <a href="https://www.youtube.com/watch?v=dXvoFRbHOiw">video</a>
+        /
+        <a href="https://arxiv.org/abs/2408.13252">arXiv</a>
+        <p></p>
+        <p>
+        LayerPano3D generates full-view, explorable panoramic 3D scene from a single text prompt.
+        </p>
+      </td>
+    </tr>
+
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <td style="padding:20px;width:25%;vertical-align:middle">
               <div class="one">
