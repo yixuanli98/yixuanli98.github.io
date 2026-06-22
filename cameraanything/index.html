@@ -23,11 +23,13 @@
   .hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 12px; }
   .hero .subtitle { font-size: 1.1rem; color: var(--muted); max-width: 720px; margin: 0 auto 20px; }
   .hero .authors { font-size: 0.95rem; color: var(--muted); margin-bottom: 16px; }
-  .hero .links a { display: inline-block; margin: 0 8px; padding: 8px 20px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: .2s; }
-  .hero .links a.primary { background: var(--accent); color: #fff; }
-  .hero .links a.primary:hover { background: #1d4ed8; }
-  .hero .links a.secondary { border: 1.5px solid var(--border); color: var(--fg); }
-  .hero .links a.secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .hero .authors a { color: var(--fg); text-decoration: none; }
+  .hero .authors a:hover { color: var(--accent); text-decoration: underline; }
+  .hero .authors .affiliations, .hero .authors .note { font-size: 0.88rem; }
+  .hero .venue { display: inline-block; margin-top: 4px; padding: 6px 16px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 1.05rem; font-weight: 800; }
+  .hero .links { margin-top: 18px; }
+  .hero .links a { display: inline-flex; align-items: center; gap: 8px; margin: 6px 6px; padding: 9px 20px; border-radius: 999px; background: #2f2f2f; color: #fff; font-size: 0.95rem; font-weight: 600; text-decoration: none; transition: .2s; }
+  .hero .links a:hover { background: #111827; transform: translateY(-1px); }
 
   /* ---- Sections ---- */
   .container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
@@ -87,7 +89,18 @@
 <div class="hero">
   <h1>CameraAnything</h1>
   <p class="subtitle">Refilming Videos with Arbitrary Camera Control</p>
-  <p class="authors">ECCV 2026 Submission — Anonymous</p>
+  <p class="authors">
+    <a href="https://yixuanli98.github.io/">Yixuan Li</a><sup>*1,2</sup>, <a href="https://zengyh1900.github.io/">Yanhong Zeng</a><sup>*2,3</sup>, <a href="https://felixcheng97.github.io/">Ka Leong Cheng</a><sup>2</sup>, <a href="https://openreview.net/profile?id=~Jiayi_Zhu10">Jiayi Zhu</a><sup>2</sup>, <a href="https://ppetrichor.github.io/">Hanlin Wang</a><sup>2,5</sup>, <a href="https://encounter1997.github.io/">Wen Wang</a><sup>2,4</sup>, <a href="https://yihao-meng.github.io/">Yihao Meng</a><sup>2,5</sup><br>
+    <a href="https://ken-ouyang.github.io/">Hao Ouyang</a><sup>2</sup>, <a href="https://scholar.google.com/citations?hl=en&user=VRsy9v8AAAAJ">Qiuyu Wang</a><sup>2</sup>, <a href="https://bruceyy.com/">Yue Yu</a><sup>2,5</sup>, <a href="https://scholar.google.com/citations?user=3sVypA8AAAAJ&hl=en">ZiDong Wang</a><sup>1</sup>, <a href="https://invictus717.github.io/">Yiyuan Zhang</a><sup>1</sup>, <a href="https://shenyujun.github.io/">Yujun Shen</a><sup>2</sup>, <a href="http://dahua.site/">Dahua Lin</a><sup>1</sup><br>
+    <span class="affiliations"><sup>1</sup>CUHK &nbsp; <sup>2</sup>Ant Group &nbsp; <sup>3</sup>Tsinghua University &nbsp; <sup>4</sup>Zhejiang University &nbsp; <sup>5</sup>HKUST</span><br>
+    <span class="note">* Equal contribution</span>
+  </p>
+  <div class="venue">ECCV 2026</div>
+  <div class="links">
+    <a href="./">📄 arXiv</a>
+    <a href="./">💻 Code</a>
+    <a href="./">🤗 Dataset</a>
+  </div>
 </div>
 
 <div class="container">
@@ -454,7 +467,7 @@
 </div>
 
 <footer>
-  ECCV 2026 Submission — Supplementary Material (Anonymous)
+  CameraAnything — ECCV 2026
 </footer>
 
 <script>
