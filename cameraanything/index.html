@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CameraAnything: Refilming Videos with Arbitrary Camera Control</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --accent: #2563eb;
+    --muted: #6b7280;
+    --card: #f9fafb;
+    --border: #e5e7eb;
+    --radius: 10px;
+    --max-w: 1100px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; }
+
+  /* ---- Header ---- */
+  .hero { text-align: center; padding: 60px 20px 40px; }
+  .hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 12px; }
+  .hero .subtitle { font-size: 1.1rem; color: var(--muted); max-width: 720px; margin: 0 auto 20px; }
+  .hero .authors { font-size: 0.95rem; color: var(--muted); margin-bottom: 16px; }
+  .hero .links a { display: inline-block; margin: 0 8px; padding: 8px 20px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: .2s; }
+  .hero .links a.primary { background: var(--accent); color: #fff; }
+  .hero .links a.primary:hover { background: #1d4ed8; }
+  .hero .links a.secondary { border: 1.5px solid var(--border); color: var(--fg); }
+  .hero .links a.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---- Sections ---- */
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
+  section { margin-bottom: 56px; }
+  section h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 4px; }
+  section p.desc { color: var(--muted); margin: 8px 0 24px; font-size: 0.95rem; }
+
+  /* ---- Video Grid ---- */
+  .video-grid { display: grid; gap: 20px; }
+  .video-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .video-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px) {
+    .video-grid.cols-2, .video-grid.cols-3 { grid-template-columns: 1fr; }
+  }
+
+  .video-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .video-card video { width: 100%; display: block; background: #000; }
+  .video-card .caption { padding: 10px 14px; font-size: 0.85rem; color: var(--muted); }
+  .video-card .caption strong { color: var(--fg); }
+
+  /* ---- Comparison (side-by-side) ---- */
+  .comparison-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .comparison-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 768px) {
+    .comparison-row, .comparison-row.cols-4 { grid-template-columns: 1fr; }
+  }
+  .comparison-row .video-card .method-tag { display: inline-block; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; }
+  .comparison-row .video-card .method-tag.ours { background: #16a34a; }
+  .comparison-row .video-card .method-tag.baseline { background: #9333ea; }
+
+  .source-strip { margin-bottom: 8px; }
+  .source-strip video { width: 100%; border-radius: var(--radius); border: 2px solid var(--accent); }
+  .source-strip .caption { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+  /* ---- Abstract ---- */
+  .abstract { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; font-size: 0.95rem; }
+
+  /* ---- Footer ---- */
+  footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  /* ---- Placeholder ---- */
+  .placeholder-video { width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.9rem; font-weight: 500; border-radius: var(--radius); }
+
+  /* ---- Pair Row (source → result) ---- */
+  .pair-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; align-items: start; }
+  @media (max-width: 768px) { .pair-row { grid-template-columns: 1fr; } }
+  .video-card .label { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; }
+  .video-card .label.source { background: #dbeafe; color: #1e40af; }
+  .video-card .label.result { background: #dcfce7; color: #166534; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- HERO -->
+<!-- ============================================================ -->
+<div class="hero">
+  <h1>CameraAnything</h1>
+  <p class="subtitle">Refilming Videos with Arbitrary Camera Control</p>
+  <p class="authors">ECCV 2026 Submission — Anonymous</p>
+</div>
+
+<div class="container">
+
+<!-- ============================================================ -->
+<!-- ABSTRACT -->
+<!-- ============================================================ -->
+<section>
+  <h2>Abstract</h2>
+  <div class="abstract">
+    We introduce <strong>CameraAnything</strong>, the first unified framework for camera controlled video editing that enables joint control of both intrinsic and extrinsic camera parameters. Existing approaches either rely on expensive 3D reconstruction to achieve full camera functionality or restrict editing to extrinsic parameter manipulation. Moreover, the coupled influence of intrinsic and extrinsic parameters on video appearance makes disentangled modeling particularly challenging.
+    To address this, we inject token-wise embedded Plücker rays into Rotary Position Encoding (RoPE) during attention computation. This design grounds each visual token in physically based camera parameters while leveraging RoPE's positional generalization, encouraging geometric consistency across views in both input and generated videos. To overcome the scarcity of paired training data, we further develop a scalable synthetic pipeline that constructs diverse dynamic scenes through structured multi-camera recording and generates synchronized videos with varied camera configurations.
+    With a tailored training strategy, CameraAnything enables expressive video reshooting with arbitrary viewpoint control, focal length adjustment, resolution adaptation, and multi-shot pose transitions within a single generation process, offering strong practical value for cinematic video editing and cross-platform content adaptation in video production.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- MULTI-SHOT -->
+<!-- ============================================================ -->
+<section>
+  <h2>Extrinsics Editing</h2>
+  <p class="desc">Re-shooting videos with novel camera trajectories, including single-shot smooth motion and multi-shot cinematic transitions.</p>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/robot_panorama.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Single continuous take</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/robot_panorama_multi_shot_extrinsics.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Multi-shot with camera cuts</div>
+    </div>
+  </div>
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/forest_walk.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Single continuous take</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/forest_walk_multi_shot_extrinsics.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Multi-shot with camera cuts</div>
+    </div>
+  </div>
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/kitchen_cleanup.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Single continuous take</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/kitchen_cleanup_multi_shot_extrinsics.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Multi-shot with camera cuts</div>
+    </div>
+  </div>
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/group_singing.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Single continuous take</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/multishot/group_singing_single_shot_extrinsics.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Single-shot camera motion</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FOCAL LENGTH -->
+<!-- ============================================================ -->
+<section>
+  <h2>Focal Length Control</h2>
+  <p class="desc">Changing the field-of-view while maintaining the same camera trajectory, simulating lens changes in post-production.</p>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/man_working_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original focal length</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/man_working_single_shot_focal_only_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Focal length change</div>
+    </div>
+  </div>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/walking_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original focal length</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/walking_single_shot_focal_only_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Focal length change</div>
+    </div>
+  </div>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/dumpling_topview_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original focal length</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/dumpling_topview_single_shot_focal_only_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Focal length change</div>
+    </div>
+  </div>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/breathing_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original focal length</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/focal/breathing_single_shot_focal_only_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Focal length change</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- RESOLUTION / ASPECT RATIO -->
+<!-- ============================================================ -->
+<section>
+  <h2>Resolution &amp; Aspect Ratio Editing</h2>
+  <p class="desc">Native resolution adaptation — converting a single source video to any target aspect ratio without masks or outpainting.</p>
+
+  <!-- Source video -->
+  <div class="source-strip" style="max-width:560px; margin:0 auto 20px;">
+    <video autoplay loop muted playsinline>
+      <source src="videos/resolutioin/taylor_source.mp4" type="video/mp4">
+    </video>
+    <div class="caption" style="text-align:center;"><strong>Source video</strong> — Original (16:9)</div>
+  </div>
+
+  <!-- 4 aspect-ratio results in 2×2 grid -->
+  <div class="video-grid cols-2">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/resolutioin/taylor_832x480_source_portrait_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption" style="text-align:center;"><span class="label result">9:16</span> Portrait</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/resolutioin/taylor_672x512_source_portrait_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption" style="text-align:center;"><span class="label result">4:3</span> Landscape</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/resolutioin/taylor_608x608_source_portrait_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption" style="text-align:center;"><span class="label result">1:1</span> Square</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/resolutioin/taylor_512x672_source_portrait_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption" style="text-align:center;"><span class="label result">3:4</span> Portrait</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- MIXED CONTROL -->
+<!-- ============================================================ -->
+<section>
+  <h2>Combined Camera Edits</h2>
+  <p class="desc">Simultaneously adjusting camera trajectory, focal length, and resolution in a single generation pass.</p>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/interview_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original video</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/interview_single_shot_focal_only_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Trajectory + Focal length change</div>
+    </div>
+  </div>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/drinking_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original video</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/drinking_single_shot_focal_only_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Trajectory + Focal length change</div>
+    </div>
+  </div>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/cooking_solo_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original video</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/cooking_solo_multi_shot_extrinsics_focal_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Multi-shot + Focal length change</div>
+    </div>
+  </div>
+
+  <div class="pair-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/sewing_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label source">Source</span> Original video</div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/mixed/sewing_multi_shot_extrinsics_focal_pred.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="label result">Result</span> Multi-shot + Focal length change + Portrait</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- BASELINE COMPARISONS -->
+<!-- ============================================================ -->
+<section>
+  <h2>Comparison with Baselines</h2>
+  <p class="desc">Side-by-side comparisons on real-world videos. All methods receive the same source video and target camera trajectory. Due to the large camera displacement and wide angular range in our test cases, TrajectoryCrafter's point-cloud inpainting approach fails to produce plausible renderings. ReCamMaster generates reasonable visual quality but is unable to synthesize a first frame from a novel viewpoint different from the source, and does not support multi-shot transitions, resulting in weaker camera controllability compared to ours.</p>
+
+  <!-- Comparison Case 1: Camel — Multi-shot Extrinsics -->
+  <div class="source-strip">
+    <video autoplay loop muted playsinline>
+      <source src="videos/comparison/camel.mp4" type="video/mp4">
+    </video>
+    <div class="caption"><strong>Source video</strong> — Camel (multi-shot extrinsics editing)</div>
+  </div>
+  <div class="comparison-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/comparison/camel_multi_shot_extrinsics_pred_trajectorycrafter.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="method-tag baseline">TrajectoryCrafter</span></div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/comparison/camel_multi_shot_extrinsics_pred_recam.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="method-tag baseline">ReCamMaster</span></div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/comparison/camel_multi_shot_extrinsics_pred_ours.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="method-tag ours">Ours</span></div>
+    </div>
+  </div>
+
+  <!-- Comparison Case 2: Lucia — Single-shot Extrinsics -->
+  <div class="source-strip">
+    <video autoplay loop muted playsinline>
+      <source src="videos/comparison/lucia.mp4" type="video/mp4">
+    </video>
+    <div class="caption"><strong>Source video</strong> — Lucia (single-shot extrinsics editing)</div>
+  </div>
+  <div class="comparison-row">
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/comparison/lucia_single_shot_extrinsics_pred_trajectorycrafter.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="method-tag baseline">TrajectoryCrafter</span></div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/comparison/lucia_single_shot_extrinsics_pred_recam.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="method-tag baseline">ReCamMaster</span></div>
+    </div>
+    <div class="video-card">
+      <video autoplay loop muted playsinline>
+        <source src="videos/comparison/lucia_single_shot_extrinsics_pred_ours.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><span class="method-tag ours">Ours</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- DATASET -->
+<!-- ============================================================ -->
+<section>
+  <h2>Dataset Samples</h2>
+  <p class="desc">Examples from our structured multi-view, multi-focal, multi-shot synthetic dataset rendered with Unreal Engine 5.</p>
+  <div id="dataset-videos">
+    <div class="video-grid cols-2">
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/dataset/groupa.mp4" type="video/mp4">
+        </video>
+        <div class="caption"><strong>Group A</strong> — Single-shot, fixed focal</div>
+      </div>
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/dataset/groupb.mp4" type="video/mp4">
+        </video>
+        <div class="caption"><strong>Group B</strong> — Multi-shot transitions, fixed focal</div>
+      </div>
+    </div>
+    <div class="video-grid cols-2" style="margin-top: 20px;">
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/dataset/groupc_1.mp4" type="video/mp4">
+        </video>
+        <div class="caption"><strong>Group C</strong> — Same extrinsics as Group A, different focal length</div>
+      </div>
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/dataset/groupc_2.mp4" type="video/mp4">
+        </video>
+        <div class="caption"><strong>Group C</strong> — Same extrinsics as Group B, different focal length</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  ECCV 2026 Submission — Supplementary Material (Anonymous)
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  function setupSyncGroup(videos) {
+    if (videos.length < 2) return;
+
+    videos.forEach(v => {
+      v.removeAttribute('loop');
+      v.pause();
+    });
+
+    function syncRestart() {
+      videos.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
+    }
+
+    videos.forEach(v => v.addEventListener('ended', syncRestart));
+
+    let pending = videos.length;
+    function onReady() {
+      pending--;
+      if (pending <= 0) syncRestart();
+    }
+    videos.forEach(v => {
+      if (v.readyState >= 3) onReady();
+      else v.addEventListener('canplay', onReady, { once: true });
+    });
+
+    setTimeout(() => { if (pending > 0) { pending = 0; syncRestart(); } }, 4000);
+  }
+
+  // Sync pair-rows (source + result side by side)
+  document.querySelectorAll('.pair-row').forEach(row => {
+    setupSyncGroup(Array.from(row.querySelectorAll('video')));
+  });
+
+  // Sync comparison groups: source-strip + its following comparison-row
+  document.querySelectorAll('.comparison-row').forEach(row => {
+    const videos = Array.from(row.querySelectorAll('video'));
+    const prev = row.previousElementSibling;
+    if (prev && prev.classList.contains('source-strip')) {
+      const srcVideo = prev.querySelector('video');
+      if (srcVideo) videos.unshift(srcVideo);
+    }
+    setupSyncGroup(videos);
+  });
+
+  // Sync dataset samples (all 4 videos together)
+  const datasetEl = document.getElementById('dataset-videos');
+  if (datasetEl) {
+    setupSyncGroup(Array.from(datasetEl.querySelectorAll('video')));
+  }
+});
+</script>
+
+</body>
+</html>
