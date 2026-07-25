@@ -90,10 +90,10 @@
   <h1>CameraAnything</h1>
   <p class="subtitle">Refilming Videos with Arbitrary Camera Control</p>
   <p class="authors">
-    <a href="https://yixuanli98.github.io/">Yixuan Li</a><sup>*1,2</sup>, <a href="https://zengyh1900.github.io/">Yanhong Zeng</a><sup>*2,3</sup>, <a href="https://felixcheng97.github.io/">Ka Leong Cheng</a><sup>2</sup>, <a href="https://openreview.net/profile?id=~Jiayi_Zhu10">Jiayi Zhu</a><sup>2</sup>, <a href="https://ppetrichor.github.io/">Hanlin Wang</a><sup>2,5</sup>, <a href="https://encounter1997.github.io/">Wen Wang</a><sup>2,4</sup>, <a href="https://yihao-meng.github.io/">Yihao Meng</a><sup>2,5</sup><br>
+    <a href="https://yixuanli98.github.io/">Yixuan Li</a><sup>*1,2</sup>, <a href="https://zengyh1900.github.io/">Yanhong Zeng</a><sup>*†2,3</sup>, <a href="https://felixcheng97.github.io/">Ka Leong Cheng</a><sup>2</sup>, <a href="https://openreview.net/profile?id=~Jiayi_Zhu10">Jiayi Zhu</a><sup>2</sup>, <a href="https://ppetrichor.github.io/">Hanlin Wang</a><sup>2,5</sup>, <a href="https://encounter1997.github.io/">Wen Wang</a><sup>2,4</sup>, <a href="https://yihao-meng.github.io/">Yihao Meng</a><sup>2,5</sup><br>
     <a href="https://ken-ouyang.github.io/">Hao Ouyang</a><sup>2</sup>, <a href="https://scholar.google.com/citations?hl=en&user=VRsy9v8AAAAJ">Qiuyu Wang</a><sup>2</sup>, <a href="https://bruceyy.com/">Yue Yu</a><sup>2,5</sup>, <a href="https://scholar.google.com/citations?user=3sVypA8AAAAJ&hl=en">ZiDong Wang</a><sup>1</sup>, <a href="https://invictus717.github.io/">Yiyuan Zhang</a><sup>1</sup>, <a href="https://shenyujun.github.io/">Yujun Shen</a><sup>2</sup>, <a href="http://dahua.site/">Dahua Lin</a><sup>1</sup><br>
     <span class="affiliations"><sup>1</sup>CUHK &nbsp; <sup>2</sup>Ant Group &nbsp; <sup>3</sup>Tsinghua University &nbsp; <sup>4</sup>Zhejiang University &nbsp; <sup>5</sup>HKUST</span><br>
-    <span class="note">* Equal contribution</span>
+    <span class="note">* Equal contribution &nbsp; <sup>†</sup> Project leader</span>
   </p>
   <div class="venue">ECCV 2026</div>
   <div class="links">
@@ -112,8 +112,8 @@
   <h2>Abstract</h2>
   <div class="abstract">
     We introduce <strong>CameraAnything</strong>, the first unified framework for camera controlled video editing that enables joint control of both intrinsic and extrinsic camera parameters. Existing approaches either rely on expensive 3D reconstruction to achieve full camera functionality or restrict editing to extrinsic parameter manipulation. Moreover, the coupled influence of intrinsic and extrinsic parameters on video appearance makes disentangled modeling particularly challenging.
-    To address this, we inject token-wise embedded Plücker rays into Rotary Position Encoding (RoPE) during attention computation. This design grounds each visual token in physically based camera parameters while leveraging RoPE's positional generalization, encouraging geometric consistency across views in both input and generated videos. To overcome the scarcity of paired training data, we further develop a scalable synthetic pipeline that constructs diverse dynamic scenes through structured multi-camera recording and generates synchronized videos with varied camera configurations.
-    With a tailored training strategy, CameraAnything enables expressive video reshooting with arbitrary viewpoint control, focal length adjustment, resolution adaptation, and multi-shot pose transitions within a single generation process, offering strong practical value for cinematic video editing and cross-platform content adaptation in video production.
+    To address this, we adopt per-pixel Plücker ray injection alongside resolution-aware 3D RoPE in self-attention, building both camera conditioning and spatial positional encoding on the target latent to jointly control camera position, focal length, and native resolution editing without cropping or outpainting. To overcome the scarcity of paired training data, we further develop a scalable synthetic pipeline that constructs diverse dynamic scenes through structured multi-camera recording and generates synchronized videos with varied camera configurations.
+    With a tailored orthogonal training strategy, CameraAnything enables expressive video reshooting with arbitrary viewpoint control, focal length adjustment, resolution adaptation, and multi-shot transitions within a single generation process, offering strong practical value for cinematic video editing and cross-platform content adaptation in video production.
   </div>
 </section>
 
@@ -257,39 +257,41 @@
   <h2>Resolution &amp; Aspect Ratio Editing</h2>
   <p class="desc">Native resolution adaptation — converting a single source video to any target aspect ratio without masks or outpainting.</p>
 
-  <!-- Source video -->
-  <div class="source-strip" style="max-width:560px; margin:0 auto 20px;">
-    <video autoplay loop muted playsinline>
-      <source src="videos/resolutioin/taylor_source.mp4" type="video/mp4">
-    </video>
-    <div class="caption" style="text-align:center;"><strong>Source video</strong> — Original (16:9)</div>
-  </div>
+  <div id="resolution-videos">
+    <!-- Source video -->
+    <div class="source-strip" style="max-width:560px; margin:0 auto 20px;">
+      <video autoplay loop muted playsinline>
+        <source src="videos/resolutioin/singing_resolution_only_source.mp4" type="video/mp4">
+      </video>
+      <div class="caption" style="text-align:center;"><strong>Source video</strong> — Original (16:9)</div>
+    </div>
 
-  <!-- 4 aspect-ratio results in 2×2 grid -->
-  <div class="video-grid cols-2">
-    <div class="video-card">
-      <video autoplay loop muted playsinline>
-        <source src="videos/resolutioin/taylor_832x480_source_portrait_pred.mp4" type="video/mp4">
-      </video>
-      <div class="caption" style="text-align:center;"><span class="label result">9:16</span> Portrait</div>
-    </div>
-    <div class="video-card">
-      <video autoplay loop muted playsinline>
-        <source src="videos/resolutioin/taylor_672x512_source_portrait_pred.mp4" type="video/mp4">
-      </video>
-      <div class="caption" style="text-align:center;"><span class="label result">4:3</span> Landscape</div>
-    </div>
-    <div class="video-card">
-      <video autoplay loop muted playsinline>
-        <source src="videos/resolutioin/taylor_608x608_source_portrait_pred.mp4" type="video/mp4">
-      </video>
-      <div class="caption" style="text-align:center;"><span class="label result">1:1</span> Square</div>
-    </div>
-    <div class="video-card">
-      <video autoplay loop muted playsinline>
-        <source src="videos/resolutioin/taylor_512x672_source_portrait_pred.mp4" type="video/mp4">
-      </video>
-      <div class="caption" style="text-align:center;"><span class="label result">3:4</span> Portrait</div>
+    <!-- 4 aspect-ratio results in 2×2 grid (natural size, same layout as before) -->
+    <div class="video-grid cols-2">
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/resolutioin/singing_resolution_only_pred_3_4.mp4" type="video/mp4">
+        </video>
+        <div class="caption" style="text-align:center;"><span class="label result">4:3</span> Landscape</div>
+      </div>
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/resolutioin/singing_resolution_only_pred_1_1.mp4" type="video/mp4">
+        </video>
+        <div class="caption" style="text-align:center;"><span class="label result">1:1</span> Square</div>
+      </div>
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/resolutioin/singing_resolution_only_pred_4_3.mp4" type="video/mp4">
+        </video>
+        <div class="caption" style="text-align:center;"><span class="label result">3:4</span> Portrait</div>
+      </div>
+      <div class="video-card">
+        <video autoplay loop muted playsinline>
+          <source src="videos/resolutioin/singing_resolution_only_pred_16_9.mp4" type="video/mp4">
+        </video>
+        <div class="caption" style="text-align:center;"><span class="label result">9:16</span> Portrait</div>
+      </div>
     </div>
   </div>
 </section>
@@ -514,6 +516,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setupSyncGroup(videos);
   });
+
+  // Sync resolution section (source + 4 aspect-ratio results)
+  const resolutionEl = document.getElementById('resolution-videos');
+  if (resolutionEl) {
+    setupSyncGroup(Array.from(resolutionEl.querySelectorAll('video')));
+  }
 
   // Sync dataset samples (all 4 videos together)
   const datasetEl = document.getElementById('dataset-videos');
